@@ -1,4 +1,4 @@
-project(fibers-1)
+project(beast-1)
 
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
 
