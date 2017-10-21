@@ -15,4 +15,5 @@ macro(add_subdirectory_cond SUBMODULE)
     endif()
 endmacro()
 
-add_subdirectory_cond(fibers-1)
+add_subdirectory_cond(beast-1)
+add_subdirectory_cond(context-1)
