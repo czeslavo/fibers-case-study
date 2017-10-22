@@ -30,6 +30,7 @@ int main()
     {
         sentence_builder = sentence_builder.resume_with([&sentence](auto&& c) {
             print_sentence(sentence);
+            return std::move(c);
         });
     }
     print_sentence(sentence);

@@ -6,14 +6,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(EXTERNALS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/externals)
 find_package(Boost 1.62 REQUIRED 
-             COMPONENTS fiber system)
+             COMPONENTS fiber system context)
 find_package(Threads REQUIRED)
 
 macro(add_subdirectory_cond SUBMODULE)
-    if(USE_${SUBMODULE} OR USE_ALL)
+    if (USE_${SUBMODULE} OR USE_ALL)
         add_subdirectory(${SUBMODULE})
     endif()
 endmacro()
 
+if (WITH_TESTS)
+    add_subdirectory(${EXTERNALS_DIR}/googletest)
+    enable_testing()
+endif()
+
 add_subdirectory_cond(beast-1)
 add_subdirectory_cond(context-1)
+add_subdirectory_cond(calculator)
+
