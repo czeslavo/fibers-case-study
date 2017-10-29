@@ -1,6 +1,7 @@
 #pragma once
 
 #include <complex>
+#include <optional>
 #include <boost/spirit/home/x3.hpp>
 
 template <typename Iterator>
@@ -67,3 +68,4 @@ bool parse_doubles(Iterator first, Iterator last, std::vector<double>& v)
     
     return r;
 }
+

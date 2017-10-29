@@ -2,6 +2,8 @@
 #include "gmock/gmock.h"
 
 #include "calculator/calculator.hpp"
+#include "calculator/roman_numerals.hpp"
+#include "calculator/config_parser.hpp"
 
 using namespace ::testing;
 
@@ -29,4 +31,23 @@ TEST(CalculatorTest, parse_doubles)
     auto r = parse_doubles(input.begin(), input.end(), v);
     ASSERT_TRUE(r);
     ASSERT_THAT(v, ElementsAre(12.5, 125.2, 1.1, 52.12));
+}
+
+TEST(CalculatorTest, parse_roman_numeral)
+{
+    auto input = std::string{"XXV"};
+
+    auto r = parse_roman_numeral(input.begin(), input.end());
+    ASSERT_THAT(r.value_or(0), 25);
+}
+
+TEST(CalculatorTest, parse_config)
+{
+    auto input = std::string{"config{12, \"Mariusz\"}"};
+    auto r = parse_config(input.begin(), input.end());
+
+    ASSERT_TRUE(r);
+    auto val = r.value();
+    ASSERT_THAT(val.instanceName, Eq("Mariusz"));
+    ASSERT_THAT(val.numOfThreads, 12);
 }
