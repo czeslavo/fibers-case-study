@@ -96,4 +96,3 @@ std::optional<int> parse_roman_numeral(Iterator first, Iterator last)
 
     return val;
 }
-

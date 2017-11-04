@@ -23,4 +23,5 @@ endif()
 add_subdirectory_cond(beast-1)
 add_subdirectory_cond(context-1)
 add_subdirectory_cond(calculator)
+add_subdirectory_cond(asio-explore)
 

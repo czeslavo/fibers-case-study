@@ -1,20 +1,20 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-#include "calculator/calculator.hpp"
-#include "calculator/roman_numerals.hpp"
-#include "calculator/config_parser.hpp"
+#include "spirit_x3_explore/numbers.hpp"
+#include "spirit_x3_explore/roman_numerals.hpp"
+#include "spirit_x3_explore/config_parser.hpp"
 
 using namespace ::testing;
 
-TEST(CalculatorTest, parse_numbers)
+TEST(SpiritX3Test, parse_numbers)
 {
     auto input = std::string{"12.555"};
     auto r = parse_numbers(input.begin(), input.end());
     ASSERT_TRUE(r);
 }
 
-TEST(CalculatorTest, parse_complex)
+TEST(SpiritX3Test, parse_complex)
 {
     auto input = std::string{"(12.555, 22.1)"};
     std::complex<double> c;
@@ -24,7 +24,7 @@ TEST(CalculatorTest, parse_complex)
     ASSERT_EQ(c.imag(), 22.1);
 }
 
-TEST(CalculatorTest, parse_doubles)
+TEST(SpiritX3Test, parse_doubles)
 {
     auto input = std::string{"12.5, 125.2, 1.1, 52.12"};
     std::vector<double> v;
@@ -33,7 +33,7 @@ TEST(CalculatorTest, parse_doubles)
     ASSERT_THAT(v, ElementsAre(12.5, 125.2, 1.1, 52.12));
 }
 
-TEST(CalculatorTest, parse_roman_numeral)
+TEST(SpiritX3Test, parse_roman_numeral)
 {
     auto input = std::string{"XXV"};
 
@@ -41,7 +41,7 @@ TEST(CalculatorTest, parse_roman_numeral)
     ASSERT_THAT(r.value_or(0), 25);
 }
 
-TEST(CalculatorTest, parse_config)
+TEST(SpiritX3Test, parse_config)
 {
     auto input = std::string{"config{12, \"Mariusz\"}"};
     auto r = parse_config(input.begin(), input.end());
