@@ -28,7 +28,8 @@ int main(int argc, char* argv[])
 
         std::array<char, 128> buffer;
         std::size_t len = socket.read_some(boost::asio::buffer(buffer), error);
-        std::cout.write(buffer.data(), len - 1);
+        std::cout << len << '\n';
+        std::cout.write(buffer.begin(), len);
         std::cout << std::endl;
     }
 }

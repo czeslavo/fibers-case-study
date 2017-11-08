@@ -41,8 +41,9 @@ public:
             const std::string numeralStr = std::to_string(numeral.value());
             std::copy(numeralStr.begin(), numeralStr.end(), data_buffer.begin());
             auto self = shared_from_this();
-            boost::asio::async_write(socket, boost::asio::buffer(data_buffer), [this, self](auto& err, size_t bytes) {
-                std::cout << "Answered, finish\n";
+            boost::asio::async_write(socket, boost::asio::buffer(data_buffer), 
+            [this, self, numeralStr](auto& err, size_t bytes) {
+                std::cout << "Answered " << numeralStr << '\n';
                 run();
             });
         }
