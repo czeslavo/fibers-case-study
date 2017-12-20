@@ -60,9 +60,9 @@ namespace parser
     using namespace boost::spirit::x3;
     using ascii::space;
 
-    auto set_zero = [&](auto& ctx) { _val(ctx) = 0; };
-    auto add1000  = [&](auto& ctx) { _val(ctx) += 1000; };
-    auto add      = [&](auto& ctx) { _val(ctx) += _attr(ctx); };
+    auto set_zero = [](auto& ctx) { _val(ctx) = 0; };
+    auto add1000  = [](auto& ctx) { _val(ctx) += 1000; };
+    auto add      = [](auto& ctx) { _val(ctx) += _attr(ctx); };
 
     const rule<class roman, int> roman = "roman";
     symbols_::hundreds_ hundreds;
