@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(EXTERNALS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/externals)
-find_package(Boost 1.62 REQUIRED 
+find_package(Boost 1.65.1 REQUIRED 
              COMPONENTS fiber system context)
 find_package(Threads REQUIRED)
 
