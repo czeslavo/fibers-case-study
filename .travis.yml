@@ -3,14 +3,12 @@ dist: trusty
 
 matrix:
   include:
-    # works on Precise and Trusty
     - os: linux
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - libboost1.65-all-dev
             - g++-7
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
@@ -21,13 +19,15 @@ matrix:
           sources:
             - llvm-toolchain-trusty-5.0
           packages:
-            - libboost1.65-all-dev
             - clang-5.0
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
 before_install:
     - eval "${MATRIX_EVAL}"
+    - ./ci/install_dependencies.sh
+
+
 
 script:
     - ./ci/build_and_run_tests.sh
