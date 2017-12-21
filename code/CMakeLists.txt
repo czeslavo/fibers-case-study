@@ -8,7 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(EXTERNALS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/externals)
 find_package(Boost 1.65.1 REQUIRED 
-             COMPONENTS fiber system context)
+             COMPONENTS system context)
 find_package(Threads REQUIRED)
 
 macro(add_subdirectory_cond SUBMODULE)
