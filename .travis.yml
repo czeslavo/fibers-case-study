@@ -1,11 +1,6 @@
 language: cpp
 dist: trusty
 
-addons:
-  apt:
-     packages:
-       - libboost-all-dev
-
 matrix:
   include:
     # works on Precise and Trusty
@@ -15,6 +10,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - libboost-all-dev
             - g++-7
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
@@ -25,9 +21,10 @@ matrix:
           sources:
             - llvm-toolchain-trusty-6.0
           packages:
-            - clang-6.0
+            - libboost-all-dev
+            - clang-5.0
       env:
-        - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
 before_install:
     - eval "${MATRIX_EVAL}"
