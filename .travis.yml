@@ -9,8 +9,9 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - ci-train-ppa-service/3000
           packages:
-            - libboost-all-dev
+            - boost1.65.1
             - g++-7
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
@@ -20,8 +21,9 @@ matrix:
         apt:
           sources:
             - llvm-toolchain-trusty-6.0
+            - ci-train-ppa-service/3000
           packages:
-            - libboost-all-dev
+            - boost1.65.1
             - clang-5.0
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
