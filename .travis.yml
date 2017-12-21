@@ -9,7 +9,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - ci-train-ppa-service/3000
+            - sourceline: 'ppa:ci-train-ppa-service/3000'
           packages:
             - boost1.65.1
             - g++-7
@@ -20,8 +20,8 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-trusty-6.0
-            - ci-train-ppa-service/3000
+            - llvm-toolchain-trusty-5.0
+            - sourceline: 'ppa:ci-train-ppa-service/3000'
           packages:
             - boost1.65.1
             - clang-5.0
