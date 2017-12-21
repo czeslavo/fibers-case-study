@@ -1,6 +1,5 @@
 project(context-1)
 
-file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
 set(SRC ${CMAKE_CURRENT_SOURCE_DIR}/source)
 
 add_executable(fibonacci ${SRC}/fibonacci.cpp)

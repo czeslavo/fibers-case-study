@@ -7,8 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(EXTERNALS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/externals)
-find_package(Boost 1.65.1 REQUIRED 
+find_package(Boost 1.66 REQUIRED 
              COMPONENTS system context)
+
 find_package(Threads REQUIRED)
 
 macro(add_subdirectory_cond SUBMODULE)
@@ -21,6 +22,9 @@ if (WITH_TESTS)
     add_subdirectory(${EXTERNALS_DIR}/googletest)
     enable_testing()
 endif()
+
+# Add boost includes as global
+include_directories(${Boost_INCLUDE_DIRS})
 
 add_subdirectory_cond(beast-1)
 add_subdirectory_cond(context-1)
