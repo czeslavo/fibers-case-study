@@ -1,6 +1,3 @@
-[submodule "code/externals/beast"]
-	path = code/externals/beast
-	url = https://github.com/boostorg/beast.git
 [submodule "code/externals/googletest"]
 	path = code/externals/googletest
 	url = https://github.com/google/googletest

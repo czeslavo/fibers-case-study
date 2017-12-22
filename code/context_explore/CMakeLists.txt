@@ -1,4 +1,4 @@
-project(context-1)
+project(context_explore)
 
 set(SRC ${CMAKE_CURRENT_SOURCE_DIR}/source)
 

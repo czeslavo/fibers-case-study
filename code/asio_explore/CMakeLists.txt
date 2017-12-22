@@ -1,4 +1,4 @@
-project(asio-explore)
+project(asio_explore)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
 
