@@ -11,3 +11,5 @@ target_link_libraries(passing_params Threads::Threads ${Boost_LIBRARIES})
 add_executable(resume_with ${SRC}/resume_with.cpp)
 target_link_libraries(resume_with Threads::Threads ${Boost_LIBRARIES})
 
+add_executable(protected_stack ${SRC}/protected_stack.cpp)
+target_link_libraries(protected_stack Threads::Threads ${Boost_LIBRARIES})

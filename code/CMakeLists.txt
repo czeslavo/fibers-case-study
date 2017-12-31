@@ -31,6 +31,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 add_subdirectory_cond(currencies_with_fibers)
 add_subdirectory_cond(context_explore)
+add_subdirectory_cond(coro_explore)
 add_subdirectory_cond(calculator)
 add_subdirectory_cond(asio_explore)
 
