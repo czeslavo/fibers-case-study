@@ -21,17 +21,13 @@ macro(add_subdirectory_cond SUBMODULE)
     endif()
 endmacro()
 
-if (WITH_TESTS)
-    add_subdirectory(${EXTERNALS_DIR}/googletest)
-    enable_testing()
-endif()
-
 # Add boost includes as global
 include_directories(${Boost_INCLUDE_DIRS})
 
-add_subdirectory_cond(currencies_with_fibers)
+add_subdirectory_cond(fibers_explore)
 add_subdirectory_cond(context_explore)
 add_subdirectory_cond(coro_explore)
-add_subdirectory_cond(calculator)
+#add_subdirectory_cond(calculator)
 add_subdirectory_cond(asio_explore)
+add_subdirectory_cond(benchmarks)
 
