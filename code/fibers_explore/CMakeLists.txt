@@ -12,6 +12,12 @@ target_link_libraries(hello Threads::Threads ${Boost_LIBRARIES})
 add_executable(buffered_channel ${SRC}/buffered_channel.cpp)
 target_link_libraries(buffered_channel Threads::Threads ${Boost_LIBRARIES})
 
-#add_executable(asio_files ${SRC}/asio_files.cpp)
-#target_link_libraries(asio_files Threads::Threads ${Boost_LIBRARIES})
+add_executable(priority ${SRC}/priority.cpp)
+target_link_libraries(priority Threads::Threads ${Boost_LIBRARIES})
 
+add_executable(graph ${SRC}/graph.cpp)
+target_link_libraries(graph Threads::Threads ${Boost_LIBRARIES})
+
+install(TARGETS poller hello buffered_channel
+                priority graph 
+        DESTINATION ${ARTIFACTS_DIR}/fiber_explore)

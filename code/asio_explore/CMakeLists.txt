@@ -16,3 +16,8 @@ target_link_libraries(roman-numerals-client Threads::Threads ${Boost_LIBRARIES})
 
 add_executable(roman-numerals-server ${SRC_DIR}/roman_numerals_server.cpp)
 target_link_libraries(roman-numerals-server Threads::Threads ${Boost_LIBRARIES})
+    
+install(TARGETS asio-timers daytime-client 
+                daytime-server roman-numerals-client 
+                roman-numerals-server  
+        DESTINATION ${ARTIFACTS_DIR}/asio_explore)

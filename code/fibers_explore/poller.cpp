@@ -11,8 +11,8 @@
 #include <boost/lexical_cast.hpp>
 #include <json.hpp>
 
-#include "round_robin.hpp"
-#include "yield.hpp"
+#include "asio/round_robin.hpp"
+#include "asio/yield.hpp"
 
 namespace http = boost::beast::http;
 namespace ip = boost::asio::ip;
@@ -97,21 +97,25 @@ void start_polling(std::shared_ptr<boost::asio::io_context> io,
 void currencies_printer(channel_t& channel) {
     std::map<std::string, double> prices;
     for (;;) {
-        for (const auto& c : channel) {
-            const auto j = json::parse(c);
-            const auto o = j.at(0);
-            const std::string name = o["name"];
-            const auto price =
-                boost::lexical_cast<double>(o["price_usd"].get<std::string>());
+        try {
+            for (const auto& c : channel) {
+                const auto j = json::parse(c);
+                const auto o = j.at(0);
+                const std::string name = o["name"];
+                const auto price =
+                    boost::lexical_cast<double>(o["price_usd"].get<std::string>());
 
-            if (prices.find(name) != prices.end()) {
-                const auto& last = prices[name];
-                if (price > last)
-                    log(name + " +" + std::to_string(price - last) + "USD");
-                else if (price < last)
-                    log(name + " -" + std::to_string(last - price) + "USD");
+                if (prices.find(name) != prices.end()) {
+                    const auto& last = prices[name];
+                    if (price > last)
+                        log(name + " +" + std::to_string(price - last) + "USD");
+                    else if (price < last)
+                        log(name + " -" + std::to_string(last - price) + "USD");
+                }
+                prices[name] = price;
             }
-            prices[name] = price;
+        } catch (...) {
+            log("Caught unexpected exception");
         }
     }
 }
@@ -120,14 +124,14 @@ int main() {
     auto io = std::make_shared<boost::asio::io_context>();
     boost::fibers::use_scheduling_algorithm<boost::fibers::asio::round_robin>(
         io);
-
     channel_t ch;
-
+   
+    using namespace std::chrono_literals;
     boost::fibers::fiber{[io, &ch]() {
-        start_polling(io, "bitcoin", ch);
+        start_polling(io, "bitcoin", ch, 5s);
     }}.detach();
     boost::fibers::fiber{[io, &ch]() {
-        start_polling(io, "litecoin", ch);
+        start_polling(io, "litecoin", ch, 10s);
     }}.detach();
     std::thread{[io, &ch]() { currencies_printer(ch); }}.detach();
 

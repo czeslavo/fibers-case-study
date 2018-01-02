@@ -13,3 +13,6 @@ target_link_libraries(resume_with Threads::Threads ${Boost_LIBRARIES})
 
 add_executable(protected_stack ${SRC}/protected_stack.cpp)
 target_link_libraries(protected_stack Threads::Threads ${Boost_LIBRARIES})
+
+install(TARGETS fibonacci passing_params resume_with protected_stack 
+        DESTINATION ${ARTIFACTS_DIR}/context_explore)
