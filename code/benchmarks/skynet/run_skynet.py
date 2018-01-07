@@ -15,6 +15,7 @@ benchmarks = [
 ]
 
 def run_single(name, n):
+    print "Running " + name + "..."
     results = []
     for i in range(10):
         results.append(
