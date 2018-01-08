@@ -13,22 +13,23 @@ using namespace boost;
 using graph_t = compressed_sparse_row_graph<directedS>;
 using vertex_t = graph_traits<graph_t>::vertex_descriptor;
 
-// visitor class for bfs algorithm
+// klasa wizytora algorytmu bfs
 struct discover_visitor : default_bfs_visitor {
     discover_visitor(boost::fibers::unbuffered_channel<vertex_t>& ch)
         : ch{ch} {}
 
-    // will be called always at vertex discovery
+    // metoda wywołana na każde odkrycie węzła grafu
+    // wypycha wartość węzła na zewnątrz
     void discover_vertex(const vertex_t vertex, const graph_t&) {
         ch.push(vertex);
     }
 
-    // channel to push vertices out the algorithm
+    // kanał do wypychania węzłów na zewnątrz
     boost::fibers::unbuffered_channel<vertex_t>& ch;
 };
 
 int main() {
-    // construct example graph
+    // utworzenie przykładowego grafu
     /*
      * 0 -> 1 -> 2
      * ^    |    |
@@ -42,20 +43,21 @@ int main() {
     auto tag = construct_inplace_from_sources_and_targets;
     graph_t graph{tag, sources, targets, n_vertices};
 
+    // węzeł początkowy dla algorytmu
     vertex_t source{0};
 
-    // create channel for pulling vertices from algorithm
+    // utworzenie kanału, przez który będą wyciągane wartości węzłów
     boost::fibers::unbuffered_channel<vertex_t> ch;
 
-    // run fiber with bfs inside, passing the visitor to it, which will send
-    // vertices through the channel
+    // uruchomienie algorytmu wewnątrz włókna, podając wizytor do niego
+    // wizytor z kanałem
     boost::fibers::fiber{[&ch, graph, source]() {
         breadth_first_search(graph, source, visitor(discover_visitor{ch}));
-        // at the end close the channel to signal client code it's the end
+        // zamknięcie kanału, zasygnalizowanie klientowi, że to koniec węzłów
         ch.close();
     }}.detach();
 
-    // lazily pull all vertices from channel
+    // leniwe wyciąganie kolejnych wartości węzłów
     for (auto vertex : ch) {
         std::cout << vertex << std::endl;
         std::cout << "*" << std::endl;

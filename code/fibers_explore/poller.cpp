@@ -22,13 +22,13 @@ using tcp = boost::asio::ip::tcp;
 using channel_t = boost::fibers::unbuffered_channel<std::string>;
 using json = nlohmann::json;
 
-// Print message to stdout with fiber id
+// Wypisz wiadomość na standardowe wyjście, otaguj id włókna
 void log(const std::string& s) {
     std::cout << "[" << boost::this_fiber::get_id() << "] " << s << '\n';
 }
 
-// Class used to poll given currency statistics and send changes on channel
-// Best to run in separate fiber
+// Klasa odpytująca API o dane na temat waluty, wysyłająca je kanałem
+// na zewnątrz
 class CurrencyPoller {
    public:
     CurrencyPoller(std::shared_ptr<boost::asio::io_context> io,
@@ -42,7 +42,7 @@ class CurrencyPoller {
           channel{channel},
           period{period} {}
 
-    // entry function, starts polling forever
+    // metoda wejściowa - łączy się i zaczyna odpytywać w nieskończoność
     void run() {
         connect();
         for (;;) poll(currency);
@@ -50,36 +50,38 @@ class CurrencyPoller {
 
    private:
     void poll(const std::string& currency) {
-        boost::system::error_code ec;
         http::request<http::string_body> req{
             http::verb::get, "/v1/ticker/" + currency + "/", 11};
         req.set(http::field::host, host);
         req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
 
-        // asynchronously write request to the stream, suspending current
-        // context with yield
+        // asynchronicznie wysyła zapytanie, zawieszając kontekst włókna
+        log("Polling " + currency);
         http::async_write(stream, req, boost::fibers::asio::yield[ec]);
 
         boost::beast::flat_buffer buffer;
         http::response<http::string_body> res;
 
-        // asynchronously read a reponse from stream, suspend current context
-        // until finished
+        // asynchronicznie czyta odpowiedź, zawieszając kontekst włókna
         http::async_read(stream, buffer, res, boost::fibers::asio::yield[ec]);
 
-        // send result to agent in charge of response processing
+        // wysyła odpowiedź do wątku procesującego poprzez kanał
         channel.push(res.body());
 
-        // suspend this fiber for a given period
+        // zawiesza włókno odpytujące na zadany okres
         boost::this_fiber::sleep_for(period);
     }
 
     void connect() {
+        // rozwiązuje adres API
         const auto endpoints = resolver.resolve(host, "https");
-        // asynchronously connect to the endpoint, suspending until finished
+
+        // asynchronicznie łączy się z API, zawieszając kontekst włókna
         boost::asio::async_connect(stream.next_layer(), endpoints.begin(),
                                    endpoints.end(),
                                    boost::fibers::asio::yield[ec]);
+
+        // wykonuje handshake SSL
         stream.handshake(ssl::stream_base::client);
     }
 
@@ -95,7 +97,8 @@ class CurrencyPoller {
     static constexpr auto host = "api.coinmarketcap.com";
 };
 
-// polling fiber function
+// funkcja pomocnicza, tworząca i uruchamiająca obiekt klasy odpytującej
+// przeznaczona do uruchomieniu na włóknie
 void start_polling(std::shared_ptr<boost::asio::io_context> io,
                    const std::string& c, channel_t& ch,
                    const std::chrono::seconds per = std::chrono::seconds(5)) {
@@ -107,21 +110,25 @@ void start_polling(std::shared_ptr<boost::asio::io_context> io,
     }
 }
 
-// response processing thread/fiber
+// funkcja przeznaczona do uruchomienia na wątku,
+// odczytuje odpowiedzi przekazywane jej kanałemm
+// zapisuje ceny i porównuje je do poprzednich
 void currencies_printer(channel_t& channel) {
     std::map<std::string, double>
         prices;  // local db for last currencies prices
     for (;;) {
         try {
-            for (const auto& c : channel) {  // if no message, wait for it
-                // get name and price from json
+            for (const auto& c :
+                 channel) {  // czeka aż otrzyma wiadomość (kanał buforowany)
+
+                // parsuje odpowiedź JSON i wyciąga nazwę i cenę waluty
                 const auto j = json::parse(c);
                 const auto o = j.at(0);
                 const std::string name = o["name"];
                 const auto price = boost::lexical_cast<double>(
                     o["price_usd"].get<std::string>());
 
-                // if price changed, print the change
+                // w wypadku zmiany ceny, wypisuje zmianę
                 if (prices.find(name) != prices.end()) {
                     const auto& last = prices[name];
                     if (price > last)
@@ -130,7 +137,7 @@ void currencies_printer(channel_t& channel) {
                         log(name + " -" + std::to_string(last - price) + "USD");
                 }
 
-                // store last price
+                // zapisuje ostatnią cenę
                 prices[name] = price;
             }
         } catch (...) {
@@ -140,14 +147,17 @@ void currencies_printer(channel_t& channel) {
 }
 
 int main() {
+    // tworzy kontekst i/o boost::asio
     auto io = std::make_shared<boost::asio::io_context>();
-    // use asio's round_robin scheduler, which allows to integrate asio and
-    // fibers
+
+    // wywołanie pozwala użyć schedulera boost::fibers::asio::round_robin
+    // przygotowanego przez autorów boost::fiber do integracji
+    // boost::fiber z boost::asio
     boost::fibers::use_scheduling_algorithm<boost::fibers::asio::round_robin>(
         io);
-    channel_t ch;
 
-    // run polling fibers
+    channel_t ch;
+    // uruchamia włókna odpytujące
     using namespace std::chrono_literals;
     boost::fibers::fiber{[io, &ch]() {
         start_polling(io, "bitcoin", ch, 5s);
@@ -156,9 +166,9 @@ int main() {
         start_polling(io, "litecoin", ch, 10s);
     }}.detach();
 
-    // run processing thread
+    // uruchamia wątek procesujący odpowiedzi
     std::thread{[io, &ch]() { currencies_printer(ch); }}.detach();
-    
-    // run io_context
+
+    // uruchamia główną pętlę boost::asio
     io->run();
 }

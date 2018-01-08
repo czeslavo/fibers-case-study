@@ -14,6 +14,8 @@ benchmarks = [
     "skynet_fiber_shared_join"
 ]
 
+# uruchamia pojedynczy test `name` o rozmiarze `n` 
+# 10-krotnie, zwracaja średni czas
 def run_single(name, n):
     print "Running " + name + "..."
     results = []
@@ -24,25 +26,24 @@ def run_single(name, n):
     return np.average(results)
     
 
+# uruchamia wszystkie testy z listy `benchmarks` 
+# dla rozmiaru problemu `agents`
 def run_all(agents):
     results = {}
     for b in benchmarks:
-        # ignore those - too much agents for ordinary threads
+        # nie uruchamiaj testów z użyciem wątków, kiedy rozmiar zbyt duży
         if b in ("skynet_async", "skynet_thread") and agents > 10000:
             continue
 
+        # zapisz wynik w słowniku
         results[b] = run_single(b, agents)
-
+    
     return results
 
-def main():
-    if len(sys.argv) < 2:
-        print "usage: " + sys.argv[0] + " number_of_agents"
-        exit(1)
 
-    agents = int(sys.argv[1])
-    results = run_all(agents)
-
+# wyrysuj wykres dla wyników `results`
+def plot_results(results):
+    # skróc nazwy 
     x = [k.replace('skynet_', '') for k in results.keys()]
     
     fig, ax = plt.subplots()
@@ -61,6 +62,20 @@ def main():
                 ha='center', va='bottom')
 
     plt.show()
+
+
+def main():
+    if len(sys.argv) < 2:
+        print "usage: " + sys.argv[0] + " number_of_agents"
+        exit(1)
+
+    agents = int(sys.argv[1])
+    
+    # przeprowadz wszystkie testy 
+    results = run_all(agents)
+
+    # wyświetl wykres
+    plot_results(results)
 
 main()
 
